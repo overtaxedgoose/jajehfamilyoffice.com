@@ -1,0 +1,151 @@
+/* Jajeh Family Office — design system
+   Quiet luxury: near-black charcoal, warm ivory, hairline brass. The sail mark is the only color.
+   Display type: Cormorant Garamond. Text: Lato (per brand guidance — logo owns the hierarchy). */
+:root {
+  --night: #16140f;
+  --night-soft: #201d17;
+  --ivory: #f3efe6;
+  --ivory-dim: #c9c2b2;
+  --brass: #ad9161;
+  --brass-dim: #7d6b4c;
+  --hairline: rgba(173, 145, 97, .35);
+  --display: "Cormorant Garamond", "Times New Roman", serif;
+  --sans: "Lato", -apple-system, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--ivory);
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  font-weight: 300;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--brass); text-decoration: none; }
+a:hover { color: var(--ivory); }
+
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 1.5rem; }
+.narrow { max-width: 720px; }
+
+/* Small-caps label */
+.label {
+  font-size: .78rem;
+  letter-spacing: .42em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 400;
+}
+
+/* Display type */
+h1, h2 {
+  font-family: var(--display);
+  font-weight: 500;
+  line-height: 1.18;
+  margin: 0 0 .4em;
+  color: var(--ivory);
+}
+h1 { font-size: clamp(2.6rem, 6.5vw, 4.6rem); letter-spacing: .01em; }
+h2 { font-size: clamp(1.9rem, 4vw, 2.9rem); }
+h3 { font-family: var(--display); font-weight: 600; font-size: 1.45rem; letter-spacing: .02em; margin: 0 0 .35em; color: var(--ivory); }
+p { margin: 0 0 1.4em; color: var(--ivory-dim); }
+p.lead { font-size: 1.15rem; }
+
+.rule { width: 64px; height: 1px; background: var(--brass); border: 0; margin: 2.2rem 0; }
+.rule.center { margin-left: auto; margin-right: auto; }
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  border: 1px solid var(--brass);
+  color: var(--brass);
+  padding: .95rem 2.6rem;
+  font-size: .82rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  transition: background .25s ease, color .25s ease;
+}
+.btn:hover { background: var(--brass); color: var(--night); }
+
+/* Header */
+.site-header {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+  padding: 1.6rem 0;
+}
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: .8rem; color: var(--ivory); }
+.brand img { height: 34px; width: auto; }
+.brand span { font-size: .8rem; letter-spacing: .34em; text-transform: uppercase; color: var(--ivory); }
+.site-nav a { margin-left: 2rem; font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; color: var(--ivory-dim); }
+.site-nav a:hover { color: var(--brass); }
+@media (max-width: 700px) { .site-nav { display: none; } }
+
+/* Hero */
+.hero {
+  min-height: 92vh;
+  display: flex; align-items: center;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 700px at 78% 18%, rgba(173, 145, 97, .07), transparent 60%),
+    var(--night);
+}
+.hero .ghost-mark {
+  position: absolute; right: -6%; bottom: -12%;
+  width: min(52vw, 640px); opacity: .05;
+  pointer-events: none; user-select: none;
+}
+.hero .inner { position: relative; padding: 8rem 0 5rem; }
+.hero h1 { max-width: 12em; }
+.hero p.lead { max-width: 34em; }
+.hero .btn { margin-top: 1.2rem; }
+
+/* Sections */
+section { padding: 6.5rem 0; }
+section.light {
+  background: var(--ivory);
+  color: var(--night);
+}
+section.light h2, section.light h3 { color: var(--night); }
+section.light p { color: #55503f; }
+section.light .label { color: var(--brass-dim); }
+
+/* Services grid */
+.services { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); margin-top: 3rem; }
+.service { border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 2.6rem 2.2rem; }
+.service .num { font-family: var(--display); font-size: .95rem; color: var(--brass-dim); letter-spacing: .1em; display: block; margin-bottom: 1rem; }
+.service p { margin: 0; font-size: .98rem; }
+
+/* Principles */
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 3.5rem; margin-top: 3rem; }
+.principle .label { display: block; margin-bottom: 1rem; }
+
+/* Engagement band */
+.engage { text-align: center; }
+.engage h2 { max-width: 18em; margin-left: auto; margin-right: auto; }
+.engage p { max-width: 36em; margin-left: auto; margin-right: auto; }
+.engage .btn { margin-top: 1.6rem; }
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--hairline);
+  padding: 3rem 0 3.4rem;
+  font-size: .85rem;
+  color: var(--ivory-dim);
+}
+.site-footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+.site-footer img { height: 26px; opacity: .85; }
+.site-footer a { color: var(--ivory-dim); }
+.site-footer a:hover { color: var(--brass); }
+
+/* Reveal on scroll */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .9s ease, transform .9s ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+}

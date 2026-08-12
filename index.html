@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jajeh Family Office</title>
+  <meta name="description" content="A private family office serving a select number of families — accounting, investments, legal affairs, and business interests, attended to as one.">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/">
+        <img src="/assets/img/mark-on-dark.png" alt="">
+        <span>Jajeh Family Office</span>
+      </a>
+      <nav class="site-nav">
+        <a href="#mandate">The Mandate</a>
+        <a href="#services">Services</a>
+        <a href="#approach">Approach</a>
+        <a href="#introduction">Introduction</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <img class="ghost-mark" src="/assets/img/mark-on-dark.png" alt="" aria-hidden="true">
+    <div class="wrap inner">
+      <p class="label">Jajeh Family Office</p>
+      <hr class="rule">
+      <h1>The whole of your wealth, attended&nbsp;to.</h1>
+      <p class="lead">A private family office serving a small number of families &mdash; accounting, investments, legal affairs, business interests, and everything they touch. One team. One standard. One&nbsp;call.</p>
+      <a class="btn" href="#introduction">Request an Introduction</a>
+    </div>
+  </section>
+
+  <section id="mandate">
+    <div class="wrap narrow reveal">
+      <p class="label">The Mandate</p>
+      <hr class="rule">
+      <h2>Wealth of consequence is not a portfolio.</h2>
+      <p class="lead">It is companies and partnerships, trusts and properties, filings and deadlines, people and their futures &mdash; a hundred moving parts that do not manage themselves.</p>
+      <p>The Jajeh Family Office exists so that all of it is attended to as one. We sit on your side of the table, engage and coordinate every professional who serves you, and carry the details so they never carry you.</p>
+    </div>
+  </section>
+
+  <section class="light" id="services">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="label">What We Attend To</p>
+        <hr class="rule">
+        <h2>One office. Every front.</h2>
+      </div>
+      <div class="services reveal">
+        <div class="service">
+          <span class="num">I</span>
+          <h3>Tax &amp; Accounting</h3>
+          <p>Planning, preparation, and exacting compliance across every entity and jurisdiction.</p>
+        </div>
+        <div class="service">
+          <span class="num">II</span>
+          <h3>Investment Oversight</h3>
+          <p>Independent supervision of managers, mandates, and performance &mdash; reported plainly.</p>
+        </div>
+        <div class="service">
+          <span class="num">III</span>
+          <h3>Legal Coordination</h3>
+          <p>Counsel engaged, briefed, and held to schedule across transactions, trusts, and disputes.</p>
+        </div>
+        <div class="service">
+          <span class="num">IV</span>
+          <h3>Business Interests</h3>
+          <p>Operating companies and partnerships stewarded from board level to bookkeeping.</p>
+        </div>
+        <div class="service">
+          <span class="num">V</span>
+          <h3>Estate &amp; Legacy</h3>
+          <p>Structures, succession, and philanthropy arranged for the generation after next.</p>
+        </div>
+        <div class="service">
+          <span class="num">VI</span>
+          <h3>Household &amp; Administration</h3>
+          <p>Payroll, properties, insurance, bill pay &mdash; the quiet machinery of daily life, run without friction.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="approach">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="label">How We Work</p>
+        <hr class="rule">
+        <h2>White glove is not a promise. It is a procedure.</h2>
+      </div>
+      <div class="principles reveal">
+        <div class="principle">
+          <span class="label">One Call</span>
+          <p>A single number reaches a senior person who knows your affairs completely. Whatever the matter, it becomes ours to resolve.</p>
+        </div>
+        <div class="principle">
+          <span class="label">Prepared, Not Presented</span>
+          <p>We come to you. Papers arrive ready, decisions arrive framed, and nothing reaches your desk twice.</p>
+        </div>
+        <div class="principle">
+          <span class="label">Discretion</span>
+          <p>Confidentiality is not a policy here; it is the practice of the house. Your affairs remain yours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="light engage" id="introduction">
+    <div class="wrap reveal">
+      <p class="label">Engagement</p>
+      <hr class="rule center">
+      <h2>We serve few families, deliberately.</h2>
+      <p>Every engagement begins with a private conversation. If we are the right office for your family &mdash; and your family for ours &mdash; you will know quickly.</p>
+      <a class="btn" href="mailto:patrick@jajehgroup.com?subject=Introduction%20%E2%80%94%20Jajeh%20Family%20Office">Request an Introduction</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <a class="brand" href="/"><img src="/assets/img/mark-on-dark.png" alt="Jajeh Family Office"></a>
+      <span>A <a href="https://jajehgroup.com">Jajeh Group</a> company</span>
+      <span>Copyright &copy; 2026 Jajeh Family Office &mdash; All Rights Reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
