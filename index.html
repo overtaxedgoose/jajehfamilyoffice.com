@@ -15,7 +15,7 @@
   <header class="site-header">
     <div class="wrap">
       <a class="brand" href="/">
-        <img src="/assets/img/mark-on-dark.png" alt="">
+        <img src="/assets/img/mark-gold.png" alt="">
         <span>Jajeh Family Office</span>
       </a>
       <nav class="site-nav">
@@ -28,13 +28,17 @@
   </header>
 
   <section class="hero">
-    <img class="ghost-mark" src="/assets/img/mark-on-dark.png" alt="" aria-hidden="true">
+    <img class="ghost-mark" src="/assets/img/mark-gold.png" alt="" aria-hidden="true">
     <div class="wrap inner">
       <p class="label">Jajeh Family Office</p>
       <hr class="rule">
-      <h1>The whole of your wealth, attended&nbsp;to.</h1>
+      <h1>One office for the whole of your&nbsp;wealth.</h1>
       <p class="lead">A private family office serving a small number of families &mdash; accounting, investments, legal affairs, business interests, and everything they touch. One team. One standard. One&nbsp;call.</p>
-      <a class="btn" href="#introduction">Request an Introduction</a>
+      <form class="intro-form" data-intro autocomplete="email">
+        <input type="email" name="email" placeholder="Your email" required aria-label="Your email">
+        <button class="btn" type="submit">Request an Introduction</button>
+      </form>
+      <p class="intro-thanks" data-thanks hidden>Thank you. We will be in touch.</p>
     </div>
   </section>
 
@@ -53,7 +57,7 @@
       <div class="reveal">
         <p class="label">What We Attend To</p>
         <hr class="rule">
-        <h2>One office. Every front.</h2>
+        <h2>Six disciplines. One exacting standard.</h2>
       </div>
       <div class="services reveal">
         <div class="service">
@@ -78,8 +82,8 @@
         </div>
         <div class="service">
           <span class="num">V</span>
-          <h3>Estate &amp; Legacy</h3>
-          <p>Structures, succession, and philanthropy arranged for the generation after next.</p>
+          <h3>Estate, Trusts &amp; Legacy</h3>
+          <p>Trusts established, funded, and administered; succession and philanthropy arranged for the generation after next.</p>
         </div>
         <div class="service">
           <span class="num">VI</span>
@@ -103,7 +107,7 @@
           <p>A single number reaches a senior person who knows your affairs completely. Whatever the matter, it becomes ours to resolve.</p>
         </div>
         <div class="principle">
-          <span class="label">Prepared, Not Presented</span>
+          <span class="label">Prepared</span>
           <p>We come to you. Papers arrive ready, decisions arrive framed, and nothing reaches your desk twice.</p>
         </div>
         <div class="principle">
@@ -118,15 +122,19 @@
     <div class="wrap reveal">
       <p class="label">Engagement</p>
       <hr class="rule center">
-      <h2>We serve few families, deliberately.</h2>
+      <h2>We choose to serve few families.</h2>
       <p>Every engagement begins with a private conversation. If we are the right office for your family &mdash; and your family for ours &mdash; you will know quickly.</p>
-      <a class="btn" href="mailto:patrick@jajehgroup.com?subject=Introduction%20%E2%80%94%20Jajeh%20Family%20Office">Request an Introduction</a>
+      <form class="intro-form center" data-intro autocomplete="email">
+        <input type="email" name="email" placeholder="Your email" required aria-label="Your email">
+        <button class="btn" type="submit">Request an Introduction</button>
+      </form>
+      <p class="intro-thanks" data-thanks hidden>Thank you. We will be in touch.</p>
     </div>
   </section>
 
   <footer class="site-footer">
     <div class="wrap">
-      <a class="brand" href="/"><img src="/assets/img/mark-on-dark.png" alt="Jajeh Family Office"></a>
+      <a class="brand" href="/"><img src="/assets/img/mark-gold.png" alt="Jajeh Family Office"></a>
       <span>A <a href="https://jajehgroup.com">Jajeh Group</a> company</span>
       <span>Copyright &copy; 2026 Jajeh Family Office &mdash; All Rights Reserved.</span>
     </div>
@@ -137,6 +145,31 @@
       for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     }, { threshold: 0.15 });
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Introduction requests: one per browser. Submissions post silently to a private form;
+    // the FORM_ACTION id is the published Google Form for patrick@jajehgroup.com.
+    const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSd0ztOChg3y5w_Arq-iIMRdTEIeVY3SpkFD3GVt9qiEcRy_QA/formResponse';
+    const KEY = 'jfo-introduction-requested';
+    const forms = document.querySelectorAll('[data-intro]');
+    const thanks = document.querySelectorAll('[data-thanks]');
+    function showThanks() {
+      forms.forEach(f => { f.classList.add('gone'); setTimeout(() => { f.hidden = true; }, 600); });
+      thanks.forEach(t => { t.hidden = false; setTimeout(() => t.classList.add('in'), 30); });
+    }
+    if (localStorage.getItem(KEY)) {
+      forms.forEach(f => { f.hidden = true; });
+      thanks.forEach(t => { t.hidden = false; t.classList.add('in'); });
+    }
+    forms.forEach(form => form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = form.email.value.trim();
+      if (!email) return;
+      const body = new FormData();
+      body.append('emailAddress', email);
+      fetch(FORM_ACTION, { method: 'POST', mode: 'no-cors', body }).catch(() => {});
+      localStorage.setItem(KEY, email);
+      showThanks();
+    }));
   </script>
 </body>
 </html>
