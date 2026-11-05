@@ -12,8 +12,13 @@
   <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
-  <!-- The horizon. A hairline across the top of every screen; the sail crosses it as you move
-       through the page, calling at one port per section. Hover a port for its name. -->
+  <!-- The backdrop never moves. Every panel's words rise over it and give way to the next. -->
+  <div class="backdrop" aria-hidden="true">
+    <img class="ghost-mark" src="/assets/img/mark-gold.png" alt="">
+  </div>
+
+  <!-- The horizon. A hairline across the top of every screen; the sail crosses it as the page
+       moves, one port per panel. Click the sail to sail on. The ports are for keyboard travel. -->
   <nav class="horizon" aria-label="Sections">
     <div class="track">
       <div class="line">
@@ -24,7 +29,7 @@
           <li><a href="#approach"><span>Approach</span></a></li>
           <li><a href="#introduction"><span>Introduction</span></a></li>
         </ol>
-        <a class="sail" href="#top" aria-label="Jajeh Family Office — return to the beginning">
+        <a class="sail" href="#top" aria-label="Sail on to the next section">
           <span class="hull"><img src="/assets/img/mark-gold.png" alt=""></span>
         </a>
       </div>
@@ -33,7 +38,6 @@
 
   <main>
     <section class="panel hero" id="top">
-      <img class="ghost-mark" src="/assets/img/mark-gold.png" alt="" aria-hidden="true">
       <div class="wrap">
         <p class="label">Jajeh Family Office</p>
         <hr class="rule">
@@ -57,38 +61,38 @@
       </div>
     </section>
 
-    <section class="panel light" id="services">
+    <section class="panel" id="services">
       <div class="wrap">
         <p class="label">What We Attend To</p>
         <hr class="rule">
         <h2>Six disciplines. One exacting standard.</h2>
         <div class="services">
-          <div class="service">
+          <div class="service" tabindex="0">
             <span class="num">I</span>
             <h3>Tax &amp; Accounting</h3>
             <p>Planning, preparation, and exacting compliance across every entity and jurisdiction.</p>
           </div>
-          <div class="service">
+          <div class="service" tabindex="0">
             <span class="num">II</span>
             <h3>Investment Oversight</h3>
             <p>Independent supervision of managers, mandates, and performance &mdash; reported plainly.</p>
           </div>
-          <div class="service">
+          <div class="service" tabindex="0">
             <span class="num">III</span>
             <h3>Legal Coordination</h3>
             <p>Counsel engaged, briefed, and held to schedule across transactions, trusts, and disputes.</p>
           </div>
-          <div class="service">
+          <div class="service" tabindex="0">
             <span class="num">IV</span>
             <h3>Business Interests</h3>
             <p>Operating companies and partnerships stewarded from board level to bookkeeping.</p>
           </div>
-          <div class="service">
+          <div class="service" tabindex="0">
             <span class="num">V</span>
             <h3>Estate, Trusts &amp; Legacy</h3>
             <p>Trusts established, funded, and administered; succession and philanthropy arranged for the generation after next.</p>
           </div>
-          <div class="service">
+          <div class="service" tabindex="0">
             <span class="num">VI</span>
             <h3>Household &amp; Administration</h3>
             <p>Payroll, properties, insurance, bill pay &mdash; the quiet machinery of daily life, run without friction.</p>
@@ -101,7 +105,7 @@
       <div class="wrap">
         <p class="label">How We Work</p>
         <hr class="rule">
-        <h2>White glove is not a promise. It is a procedure.</h2>
+        <h2>Quietly, completely, and in person.</h2>
         <div class="principles">
           <div class="principle">
             <span class="label">One Call</span>
@@ -112,14 +116,14 @@
             <p>We come to you. Papers arrive ready, decisions arrive framed, and nothing reaches your desk twice.</p>
           </div>
           <div class="principle">
-            <span class="label">Discretion</span>
+            <span class="label">With Discretion</span>
             <p>Confidentiality is not a policy here; it is the practice of the house. Your affairs remain yours.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="panel light engage" id="introduction">
+    <section class="panel engage" id="introduction">
       <div class="wrap">
         <p class="label">Engagement</p>
         <hr class="rule center">
@@ -142,37 +146,37 @@
   </main>
 
   <script>
-    // One panel at a time. The panel under the middle of the viewport is the one being read;
-    // every other panel's words fade out. The sail on the horizon tracks progress through the
-    // page, calling at one port per panel and heeling in the direction of travel.
+    // The page moves only by our hand. One panel at a time, slowly, eased at both ends; the
+    // panel in view keeps its words and the others' fade with their distance from the screen.
+    // The sail on the horizon tracks progress and heels in the direction of travel.
     (() => {
       const panels = Array.from(document.querySelectorAll('.panel'));
       const horizon = document.querySelector('.horizon');
       const sail = horizon.querySelector('.sail');
       const ports = Array.from(horizon.querySelectorAll('.ports li'));
       const last = panels.length - 1;
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const tops = () => panels.map(p => p.offsetTop);
+      const nearest = y => { const t = tops(); let k = 0; t.forEach((top, i) => { if (Math.abs(top - y) < Math.abs(t[k] - y)) k = i; }); return k; };
       ports.forEach((li, i) => { li.style.left = (i / last * 100) + '%'; });
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
+      // Where we are. Runs every scroll frame: sets the sail, the panel in view, and each panel's words.
       let lastY = window.scrollY, settle = 0, queued = false;
-      function update() {
+      function paint() {
         queued = false;
-        const y = window.scrollY, mid = y + window.innerHeight / 2;
-        const tops = panels.map(p => p.offsetTop);
-
-        // Progress: which panel the top of the viewport is in, and how far through it.
+        const y = window.scrollY, vh = window.innerHeight, t = tops();
         let i = 0;
-        while (i < last && y >= tops[i + 1]) i++;
-        const frac = i < last ? Math.min(Math.max((y - tops[i]) / (tops[i + 1] - tops[i]), 0), 1) : 0;
+        while (i < last && y >= t[i + 1]) i++;
+        const frac = i < last ? Math.min(Math.max((y - t[i]) / (t[i + 1] - t[i]), 0), 1) : 0;
         sail.style.left = (Math.min((i + frac) / last, 1) * 100) + '%';
-
-        // The panel being read.
-        let here = 0;
-        while (here < last && mid >= tops[here + 1]) here++;
-        panels.forEach((p, k) => p.classList.toggle('is-active', k === here));
+        const here = nearest(y);
+        panels.forEach((p, k) => {
+          p.classList.toggle('is-active', k === here);
+          const away = Math.abs(t[k] - y) / vh;                 // screens between this panel and the viewport
+          p.style.setProperty('--words', Math.max(0, 1 - away * 1.6).toFixed(3));
+        });
         ports.forEach((li, k) => li.classList.toggle('is-here', k === here));
-        document.body.classList.toggle('on-light', panels[here].classList.contains('light'));
-
-        // Under way: heel toward the direction of travel, then settle.
         if (y !== lastY) {
           horizon.dataset.heading = y > lastY ? 'on' : 'back';
           clearTimeout(settle);
@@ -180,11 +184,96 @@
         }
         lastY = y;
       }
-      function schedule() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+      const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(paint); } };
       addEventListener('scroll', schedule, { passive: true });
-      addEventListener('resize', schedule);
-      addEventListener('load', schedule);
-      update();
+
+      // Sailing. A long, even glide from one panel to the next; longer still across several.
+      let at = nearest(window.scrollY), busy = false, restUntil = 0;
+      const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      function sailTo(k) {
+        k = Math.max(0, Math.min(last, k));
+        const from = window.scrollY, to = panels[k].offsetTop;
+        at = k;
+        if (still || Math.abs(to - from) < 1) { window.scrollTo(0, to); paint(); return; }
+        const screens = Math.abs(to - from) / window.innerHeight;
+        const length = Math.min(1600 + 400 * (screens - 1), 2800);
+        busy = true;
+        const t0 = performance.now();
+        (function step(now) {
+          const x = Math.min((now - t0) / length, 1);
+          window.scrollTo(0, from + (to - from) * ease(x));
+          if (x < 1) requestAnimationFrame(step);
+          else { window.scrollTo(0, panels[k].offsetTop); busy = false; restUntil = performance.now() + 350; }
+        })(t0);
+      }
+      const go = dir => { if (!busy && performance.now() > restUntil) sailTo(at + dir); };
+
+      // A panel whose words run past one screen scrolls inside its own box before the page moves on.
+      function innerRoom(target, dir) {
+        const box = target && target.closest ? target.closest('.panel > .wrap') : null;
+        if (!box || box.scrollHeight <= box.clientHeight + 1) return false;
+        return dir > 0 ? box.scrollTop + box.clientHeight < box.scrollHeight - 1 : box.scrollTop > 0;
+      }
+
+      // Wheel and trackpad: one gesture, one panel. The inertia tail of a gesture is ignored.
+      let lastWheel = 0, gestureSpent = false;
+      addEventListener('wheel', e => {
+        const now = performance.now();
+        if (now - lastWheel > 160) gestureSpent = false;
+        lastWheel = now;
+        const dir = Math.sign(e.deltaY);
+        if (!dir || gestureSpent) return;
+        gestureSpent = true;
+        if (!innerRoom(e.target, dir)) go(dir);
+      }, { passive: true });
+
+      // Touch: a swipe of any weight moves one panel, unless the panel itself has room to scroll.
+      let touch = null;
+      addEventListener('touchstart', e => {
+        touch = { y: e.touches[0].clientY, down: innerRoom(e.target, 1), up: innerRoom(e.target, -1) };
+      }, { passive: true });
+      addEventListener('touchend', e => {
+        if (!touch) return;
+        const dy = touch.y - e.changedTouches[0].clientY, dir = Math.sign(dy), t = touch;
+        touch = null;
+        if (Math.abs(dy) < 40 || !dir || (dir > 0 ? t.down : t.up)) return;
+        go(dir);
+      }, { passive: true });
+
+      // Keys: arrows, page keys and space move one panel; Home and End go to the ends.
+      addEventListener('keydown', e => {
+        if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+        const el = e.target, tag = (el.tagName || '').toLowerCase();
+        if (/^(input|textarea|select|button)$/.test(tag) || el.isContentEditable) return;
+        const step = { ArrowDown: 1, PageDown: 1, ' ': e.shiftKey ? -1 : 1, ArrowUp: -1, PageUp: -1 }[e.key];
+        if (step) { e.preventDefault(); go(step); }
+        else if (e.key === 'Home') { e.preventDefault(); sailTo(0); }
+        else if (e.key === 'End') { e.preventDefault(); sailTo(last); }
+      });
+
+      // Links to panels sail rather than jump. The sail itself goes on to the next port, and home from the last.
+      document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+        const k = panels.findIndex(p => '#' + p.id === a.getAttribute('href'));
+        if (k < 0) return;
+        e.preventDefault();
+        sailTo(a === sail ? (at === last ? 0 : at + 1) : k);
+      }));
+
+      // Keyboard focus landing in another panel brings that panel in.
+      addEventListener('focusin', e => {
+        const p = e.target.closest && e.target.closest('.panel');
+        const k = p ? panels.indexOf(p) : -1;
+        if (k >= 0 && k !== at && !busy) { window.scrollTo(0, panels[at].offsetTop); sailTo(k); }
+      });
+
+      addEventListener('resize', () => { if (!busy) window.scrollTo(0, panels[at].offsetTop); schedule(); });
+      window.scrollTo(0, panels[at].offsetTop);
+      paint();
+
+      // Services: on screens without a cursor, a tap stands in for hover.
+      if (matchMedia('(hover: none)').matches) {
+        document.querySelectorAll('.service').forEach(s => s.addEventListener('click', () => s.classList.toggle('open')));
+      }
     })();
 
     // Introduction requests: one per browser. Submissions post silently to a private form;

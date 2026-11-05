@@ -1,8 +1,9 @@
 /* Jajeh Family Office — design system
    Quiet luxury: near-black charcoal, warm ivory, hairline brass. The sail mark is the only color.
    Display type: Cormorant Garamond. Text: Lato (per brand guidance — logo owns the hierarchy).
-   The page is a run of full-screen panels. One is read at a time; the rest go dark.
-   There is no header: a hairline "horizon" rides the top of the screen and the sail crosses it. */
+   One backdrop, frozen. The page is a run of full-screen panels of words that rise over it, one
+   at a time, moved only by hand and slowly. There is no header: a hairline "horizon" rides the
+   top of the screen and the sail crosses it. */
 :root {
   --night: #16140f;
   --night-soft: #201d17;
@@ -11,13 +12,16 @@
   --brass: #ad9161;
   --brass-dim: #7d6b4c;
   --hairline: rgba(173, 145, 97, .35);
-  --hairline-dim: rgba(125, 107, 76, .4);
   --display: "Cormorant Garamond", "Times New Roman", serif;
   --sans: "Lato", -apple-system, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+html {
+  overflow: hidden;              /* the page moves only by script: wheel, swipe and keys are read, not obeyed */
+  touch-action: pinch-zoom;
+  scroll-behavior: auto;
+}
 body {
   margin: 0;
   background: var(--night);
@@ -78,40 +82,47 @@ p.lead { font-size: 1.15rem; }
 }
 .btn:hover { background: var(--brass); color: var(--night); }
 
-/* Panels — one screen each. The page snaps from one to the next and never rests between. */
+/* The backdrop — the first screen's scene, frozen behind everything */
+.backdrop {
+  position: fixed; inset: 0; z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 700px at 78% 18%, rgba(173, 145, 97, .07), transparent 60%),
+    var(--night);
+}
+.backdrop .ghost-mark {
+  position: absolute; right: -6%; bottom: -12%;
+  width: min(52vw, 640px); opacity: .05;
+  user-select: none;
+}
+main { position: relative; z-index: 1; }
+
+/* Panels — one screen each, no background of their own. Words only. */
 .panel {
   position: relative;
-  min-height: 100vh;
-  min-height: 100svh;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  height: 100vh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: clamp(5rem, 12vh, 7.5rem) 0 clamp(3rem, 7vh, 5rem);
 }
-.panel > .wrap { width: 100%; }
-/* Only the panel being read keeps its words. The others are gone, not merely off-screen. */
-.panel > .wrap, .panel > .site-footer {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity .45s ease, transform .45s ease;
+.panel > .wrap {
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;              /* only ever used on small screens, where a panel's words may run long */
+  scrollbar-width: none;
 }
-.panel.is-active > .wrap, .panel.is-active > .site-footer {
-  opacity: 1;
-  transform: none;
-  transition: opacity .9s ease .25s, transform .9s ease .25s;
-}
-.panel.light {
-  background: var(--ivory);
-  color: var(--night);
-}
-.panel.light h2, .panel.light h3 { color: var(--night); }
-.panel.light p { color: #55503f; }
-.panel.light .label { color: var(--brass-dim); }
+.panel > .wrap::-webkit-scrollbar { display: none; }
+/* --words is set by script from the panel's distance to the screen: 1 in view, 0 a screen away */
+.panel > .wrap, .panel > .site-footer { opacity: var(--words, 1); }
+.hero > .wrap { animation: rise 1.6s cubic-bezier(.2, .7, .2, 1) .15s backwards; }
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } }
 
-/* The horizon — a hairline at the top of every screen. Ports mark the panels; the sail
-   crosses from one to the next as the page moves, and heels into the direction of travel. */
+/* The horizon — a hairline at the top of every screen. The sail crosses it as the page moves
+   and heels into the direction of travel. The ports beneath it are unmarked; keyboard users
+   find them by tab, and a port's name appears only then. */
 .horizon {
   position: fixed; top: 0; left: 0; right: 0; z-index: 20;
   padding-top: 2.6rem;
@@ -123,81 +134,63 @@ p.lead { font-size: 1.15rem; }
   height: 1px;
   margin: 0 14px;
   background: var(--hairline);
-  transition: background-color .6s ease;
 }
-body.on-light .horizon .line { background: var(--hairline-dim); }
 
 .ports { list-style: none; margin: 0; padding: 0; }
 .ports li { position: absolute; top: 0; left: 0; }
 .ports a {
   position: absolute; left: 0; top: 0;
-  width: 28px; height: 28px;
-  transform: translate(-50%, -50%);
-  pointer-events: auto;
+  width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%);
+  pointer-events: none;
 }
-.ports a::before {                 /* the port: a tick on the line */
-  content: "";
-  position: absolute; left: 50%; top: 50%;
-  width: 1px; height: 7px;
-  transform: translate(-50%, -50%);
-  background: var(--brass);
-  opacity: .5;
-  transition: height .35s ease, opacity .35s ease, background-color .6s ease;
+.ports a:focus-visible {
+  width: auto; height: auto; overflow: visible;
+  clip-path: none;
+  transform: translate(-50%, 10px);
+  outline: none;
 }
-.ports a:hover::before, .ports li.is-here a::before { opacity: 1; height: 11px; }
-body.on-light .ports a::before { background: var(--brass-dim); }
-.ports a span {                    /* its name, only when asked for */
-  position: absolute; left: 50%; top: 100%;
-  transform: translateX(-50%);
+.ports a span {
+  display: block;
   font-size: .62rem;
   letter-spacing: .32em;
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--brass);
-  opacity: 0;
-  transition: opacity .3s ease;
 }
-.ports a:hover span, .ports a:focus-visible span { opacity: 1; }
-body.on-light .ports a span { color: var(--brass-dim); }
-.ports li:first-child a span { left: 0; transform: none; }
-.ports li:last-child a span { left: auto; right: 0; transform: none; }
+.ports li:first-child a:focus-visible { transform: translate(0, 10px); }
+.ports li:last-child a:focus-visible { transform: translate(-100%, 10px); }
 
 .sail {
   position: absolute; left: 0; bottom: -3px;   /* the hull sits on the line */
   width: 34px;
   transform: translateX(-50%);
   pointer-events: auto;
-  transition: left .55s cubic-bezier(.22, .61, .36, 1);
+  transition: left .8s cubic-bezier(.22, .61, .36, 1);
   animation: setsail 1.8s cubic-bezier(.2, .8, .2, 1) both;
 }
 .sail .hull { display: block; transform-origin: 50% 90%; animation: rock 5s ease-in-out infinite; }
-.sail img { display: block; width: 100%; transform-origin: 50% 90%; transition: transform .5s cubic-bezier(.3, .7, .3, 1); }
+.sail img { display: block; width: 100%; transform-origin: 50% 90%; transition: transform .6s cubic-bezier(.3, .7, .3, 1); }
 .horizon[data-heading="on"] .sail img { transform: rotate(8deg); }
 .horizon[data-heading="back"] .sail img { transform: rotate(-8deg); }
 @keyframes rock { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
 @keyframes setsail { from { opacity: 0; margin-left: -56px; } to { opacity: 1; margin-left: 0; } }
 
 /* Hero */
-.hero {
-  overflow: hidden;
-  background:
-    radial-gradient(1200px 700px at 78% 18%, rgba(173, 145, 97, .07), transparent 60%),
-    var(--night);
-}
-.hero .ghost-mark {
-  position: absolute; right: -6%; bottom: -12%;
-  width: min(52vw, 640px); opacity: .05;
-  pointer-events: none; user-select: none;
-}
-.hero .wrap { position: relative; }
 .hero h1 { max-width: 12em; }
 .hero p.lead { max-width: 34em; }
 
-/* Services grid */
+/* Services grid — a numeral and a name; the rest is told on approach */
 .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); margin-top: 2.5rem; }
-.service { border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 2.2rem 2rem; }
+.service { border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 2.2rem 2rem; cursor: default; outline: none; }
+.service:focus-visible { box-shadow: inset 0 0 0 1px var(--brass); }
 .service .num { font-family: var(--display); font-size: .95rem; color: var(--brass-dim); letter-spacing: .1em; display: block; margin-bottom: 1rem; }
-.service p { margin: 0; font-size: .98rem; }
+.service p {
+  margin: 0; font-size: .98rem;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.service:hover p, .service:focus-within p, .service.open p { opacity: 1; transform: none; }
 
 /* Principles */
 .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 3.5rem; margin-top: 2.5rem; }
@@ -211,17 +204,17 @@ body.on-light .ports a span { color: var(--brass-dim); }
 
 /* Footer */
 .site-footer {
-  border-top: 1px solid var(--hairline-dim);
+  border-top: 1px solid var(--hairline);
   padding: 2rem 0 2.4rem;
   font-size: .85rem;
-  color: #6b6452;
+  color: var(--ivory-dim);
   text-align: left;
 }
 .site-footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
 .site-footer .brand { display: flex; align-items: center; }
 .site-footer img { height: 26px; opacity: .85; }
-.site-footer a { color: #6b6452; }
-.site-footer a:hover { color: var(--brass-dim); }
+.site-footer a { color: var(--ivory-dim); }
+.site-footer a:hover { color: var(--brass); }
 
 /* Introduction email capture */
 .intro-form { display: flex; flex-wrap: wrap; gap: .9rem; margin-top: 1.6rem; transition: opacity .6s ease, transform .6s ease; }
@@ -240,9 +233,6 @@ body.on-light .ports a span { color: var(--brass-dim); }
 }
 .intro-form input::placeholder { color: var(--ivory-dim); opacity: .7; }
 .intro-form input:focus { border-bottom-color: var(--brass); }
-.panel.light .intro-form input { color: var(--night); border-bottom-color: rgba(125, 107, 76, .45); }
-.panel.light .intro-form input::placeholder { color: #8a8371; }
-.panel.light .intro-form input:focus { border-bottom-color: var(--brass-dim); }
 .intro-thanks {
   font-family: var(--display); font-size: 1.5rem; color: var(--brass);
   margin-top: 1.8rem;
@@ -250,7 +240,6 @@ body.on-light .ports a span { color: var(--brass-dim); }
   transition: opacity .9s ease .35s, transform .9s ease .35s;
 }
 .intro-thanks.in { opacity: 1; transform: none; }
-.panel.light .intro-thanks { color: var(--brass-dim); }
 
 /* Tighter on short or narrow screens so each panel still fits one screen */
 @media (max-height: 820px) {
@@ -265,15 +254,23 @@ body.on-light .ports a span { color: var(--brass-dim); }
 @media (max-width: 700px) {
   .panel { padding: 4.6rem 0 2.5rem; }
   .engage { padding-bottom: 0; }
-  .service { padding: 1.5rem 1.3rem; }
+  .services { grid-template-columns: 1fr 1fr; }
+  .service { padding: 1.2rem 1rem; }
+  .service h3 { font-size: 1.2rem; }
+  .service p { font-size: .9rem; line-height: 1.6; }
   .principles { gap: 2rem; }
   .site-footer .wrap { justify-content: center; text-align: center; }
 }
+/* Without a cursor there is no hover: the subtext stays folded until tapped, so six fit one screen */
+@media (hover: none) {
+  .service p { max-height: 0; overflow: hidden; transition: opacity .7s ease, transform .7s ease, max-height .7s ease; }
+  .service.open p { max-height: 14em; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .panel > .wrap, .panel > .site-footer { transform: none; transition: opacity .3s ease; }
+  .hero > .wrap { animation: none; }
   .sail { transition: none; animation: none; }
   .sail .hull { animation: none; }
   .sail img { transition: none; transform: none !important; }
+  .service p { transition: opacity .3s ease; transform: none; }
 }
