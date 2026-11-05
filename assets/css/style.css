@@ -1,6 +1,8 @@
 /* Jajeh Family Office — design system
    Quiet luxury: near-black charcoal, warm ivory, hairline brass. The sail mark is the only color.
-   Display type: Cormorant Garamond. Text: Lato (per brand guidance — logo owns the hierarchy). */
+   Display type: Cormorant Garamond. Text: Lato (per brand guidance — logo owns the hierarchy).
+   The page is a run of full-screen panels. One is read at a time; the rest go dark.
+   There is no header: a hairline "horizon" rides the top of the screen and the sail crosses it. */
 :root {
   --night: #16140f;
   --night-soft: #201d17;
@@ -9,12 +11,13 @@
   --brass: #ad9161;
   --brass-dim: #7d6b4c;
   --hairline: rgba(173, 145, 97, .35);
+  --hairline-dim: rgba(125, 107, 76, .4);
   --display: "Cormorant Garamond", "Times New Roman", serif;
   --sans: "Lato", -apple-system, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
 body {
   margin: 0;
   background: var(--night);
@@ -75,24 +78,107 @@ p.lead { font-size: 1.15rem; }
 }
 .btn:hover { background: var(--brass); color: var(--night); }
 
-/* Header */
-.site-header {
-  position: absolute; top: 0; left: 0; right: 0; z-index: 10;
-  padding: 1.6rem 0;
+/* Panels — one screen each. The page snaps from one to the next and never rests between. */
+.panel {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(5rem, 12vh, 7.5rem) 0 clamp(3rem, 7vh, 5rem);
 }
-.site-header .wrap { display: flex; align-items: center; justify-content: space-between; }
-.brand { display: flex; align-items: center; gap: .8rem; color: var(--ivory); }
-.brand img { height: 34px; width: auto; }
-.brand span { font-size: .8rem; letter-spacing: .34em; text-transform: uppercase; color: var(--ivory); }
-.site-nav a { margin-left: 2rem; font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; color: var(--ivory-dim); }
-.site-nav a:hover { color: var(--brass); }
-@media (max-width: 700px) { .site-nav { display: none; } }
+.panel > .wrap { width: 100%; }
+/* Only the panel being read keeps its words. The others are gone, not merely off-screen. */
+.panel > .wrap, .panel > .site-footer {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .45s ease, transform .45s ease;
+}
+.panel.is-active > .wrap, .panel.is-active > .site-footer {
+  opacity: 1;
+  transform: none;
+  transition: opacity .9s ease .25s, transform .9s ease .25s;
+}
+.panel.light {
+  background: var(--ivory);
+  color: var(--night);
+}
+.panel.light h2, .panel.light h3 { color: var(--night); }
+.panel.light p { color: #55503f; }
+.panel.light .label { color: var(--brass-dim); }
+
+/* The horizon — a hairline at the top of every screen. Ports mark the panels; the sail
+   crosses from one to the next as the page moves, and heels into the direction of travel. */
+.horizon {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  padding-top: 2.6rem;
+  pointer-events: none;
+}
+.horizon .track { max-width: 1060px; margin: 0 auto; padding: 0 1.5rem; }
+.horizon .line {
+  position: relative;
+  height: 1px;
+  margin: 0 14px;
+  background: var(--hairline);
+  transition: background-color .6s ease;
+}
+body.on-light .horizon .line { background: var(--hairline-dim); }
+
+.ports { list-style: none; margin: 0; padding: 0; }
+.ports li { position: absolute; top: 0; left: 0; }
+.ports a {
+  position: absolute; left: 0; top: 0;
+  width: 28px; height: 28px;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+.ports a::before {                 /* the port: a tick on the line */
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 1px; height: 7px;
+  transform: translate(-50%, -50%);
+  background: var(--brass);
+  opacity: .5;
+  transition: height .35s ease, opacity .35s ease, background-color .6s ease;
+}
+.ports a:hover::before, .ports li.is-here a::before { opacity: 1; height: 11px; }
+body.on-light .ports a::before { background: var(--brass-dim); }
+.ports a span {                    /* its name, only when asked for */
+  position: absolute; left: 50%; top: 100%;
+  transform: translateX(-50%);
+  font-size: .62rem;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--brass);
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.ports a:hover span, .ports a:focus-visible span { opacity: 1; }
+body.on-light .ports a span { color: var(--brass-dim); }
+.ports li:first-child a span { left: 0; transform: none; }
+.ports li:last-child a span { left: auto; right: 0; transform: none; }
+
+.sail {
+  position: absolute; left: 0; bottom: -3px;   /* the hull sits on the line */
+  width: 34px;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  transition: left .55s cubic-bezier(.22, .61, .36, 1);
+  animation: setsail 1.8s cubic-bezier(.2, .8, .2, 1) both;
+}
+.sail .hull { display: block; transform-origin: 50% 90%; animation: rock 5s ease-in-out infinite; }
+.sail img { display: block; width: 100%; transform-origin: 50% 90%; transition: transform .5s cubic-bezier(.3, .7, .3, 1); }
+.horizon[data-heading="on"] .sail img { transform: rotate(8deg); }
+.horizon[data-heading="back"] .sail img { transform: rotate(-8deg); }
+@keyframes rock { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
+@keyframes setsail { from { opacity: 0; margin-left: -56px; } to { opacity: 1; margin-left: 0; } }
 
 /* Hero */
 .hero {
-  min-height: 92vh;
-  display: flex; align-items: center;
-  position: relative;
   overflow: hidden;
   background:
     radial-gradient(1200px 700px at 78% 18%, rgba(173, 145, 97, .07), transparent 60%),
@@ -103,48 +189,39 @@ p.lead { font-size: 1.15rem; }
   width: min(52vw, 640px); opacity: .05;
   pointer-events: none; user-select: none;
 }
-.hero .inner { position: relative; padding: 8rem 0 5rem; }
+.hero .wrap { position: relative; }
 .hero h1 { max-width: 12em; }
 .hero p.lead { max-width: 34em; }
-.hero .btn { margin-top: 1.2rem; }
-
-/* Sections */
-section { padding: 6.5rem 0; }
-section.light {
-  background: var(--ivory);
-  color: var(--night);
-}
-section.light h2, section.light h3 { color: var(--night); }
-section.light p { color: #55503f; }
-section.light .label { color: var(--brass-dim); }
 
 /* Services grid */
-.services { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); margin-top: 3rem; }
-.service { border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 2.6rem 2.2rem; }
+.services { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); margin-top: 2.5rem; }
+.service { border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 2.2rem 2rem; }
 .service .num { font-family: var(--display); font-size: .95rem; color: var(--brass-dim); letter-spacing: .1em; display: block; margin-bottom: 1rem; }
 .service p { margin: 0; font-size: .98rem; }
 
 /* Principles */
-.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 3.5rem; margin-top: 3rem; }
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 3.5rem; margin-top: 2.5rem; }
 .principle .label { display: block; margin-bottom: 1rem; }
 
-/* Engagement band */
-.engage { text-align: center; }
+/* Engagement — the last panel carries the footer at its foot */
+.engage { text-align: center; padding-bottom: 0; }
+.engage > .wrap { margin: auto; }
 .engage h2 { max-width: 18em; margin-left: auto; margin-right: auto; }
 .engage p { max-width: 36em; margin-left: auto; margin-right: auto; }
-.engage .btn { margin-top: 1.6rem; }
 
 /* Footer */
 .site-footer {
-  border-top: 1px solid var(--hairline);
-  padding: 3rem 0 3.4rem;
+  border-top: 1px solid var(--hairline-dim);
+  padding: 2rem 0 2.4rem;
   font-size: .85rem;
-  color: var(--ivory-dim);
+  color: #6b6452;
+  text-align: left;
 }
 .site-footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+.site-footer .brand { display: flex; align-items: center; }
 .site-footer img { height: 26px; opacity: .85; }
-.site-footer a { color: var(--ivory-dim); }
-.site-footer a:hover { color: var(--brass); }
+.site-footer a { color: #6b6452; }
+.site-footer a:hover { color: var(--brass-dim); }
 
 /* Introduction email capture */
 .intro-form { display: flex; flex-wrap: wrap; gap: .9rem; margin-top: 1.6rem; transition: opacity .6s ease, transform .6s ease; }
@@ -163,9 +240,9 @@ section.light .label { color: var(--brass-dim); }
 }
 .intro-form input::placeholder { color: var(--ivory-dim); opacity: .7; }
 .intro-form input:focus { border-bottom-color: var(--brass); }
-section.light .intro-form input { color: var(--night); border-bottom-color: rgba(125, 107, 76, .45); }
-section.light .intro-form input::placeholder { color: #8a8371; }
-section.light .intro-form input:focus { border-bottom-color: var(--brass-dim); }
+.panel.light .intro-form input { color: var(--night); border-bottom-color: rgba(125, 107, 76, .45); }
+.panel.light .intro-form input::placeholder { color: #8a8371; }
+.panel.light .intro-form input:focus { border-bottom-color: var(--brass-dim); }
 .intro-thanks {
   font-family: var(--display); font-size: 1.5rem; color: var(--brass);
   margin-top: 1.8rem;
@@ -173,12 +250,30 @@ section.light .intro-form input:focus { border-bottom-color: var(--brass-dim); }
   transition: opacity .9s ease .35s, transform .9s ease .35s;
 }
 .intro-thanks.in { opacity: 1; transform: none; }
-section.light .intro-thanks { color: var(--brass-dim); }
+.panel.light .intro-thanks { color: var(--brass-dim); }
 
-/* Reveal on scroll */
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity .9s ease, transform .9s ease; }
-.reveal.in { opacity: 1; transform: none; }
+/* Tighter on short or narrow screens so each panel still fits one screen */
+@media (max-height: 820px) {
+  .panel { padding-top: 4.8rem; }
+  .rule { margin: 1.4rem 0; }
+  .service { padding: 1.5rem 1.4rem; }
+  .service p { line-height: 1.7; }
+  h2 { margin-bottom: .3em; }
+  .services, .principles { margin-top: 1.8rem; }
+  .principles { gap: 2.2rem; }
+}
+@media (max-width: 700px) {
+  .panel { padding: 4.6rem 0 2.5rem; }
+  .engage { padding-bottom: 0; }
+  .service { padding: 1.5rem 1.3rem; }
+  .principles { gap: 2rem; }
+  .site-footer .wrap { justify-content: center; text-align: center; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .reveal { opacity: 1; transform: none; transition: none; }
+  .panel > .wrap, .panel > .site-footer { transform: none; transition: opacity .3s ease; }
+  .sail { transition: none; animation: none; }
+  .sail .hull { animation: none; }
+  .sail img { transition: none; transform: none !important; }
 }
