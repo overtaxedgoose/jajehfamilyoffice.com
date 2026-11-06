@@ -25,11 +25,16 @@ Hosted on GitHub Pages (repo: overtaxedgoose/jajehfamilyoffice.com). Built Augus
   progress, heels 8° in the direction of travel, rocks gently at rest, and sails in from the left
   on load. Clicking the sail sails on to the next panel (and home from the last). The ports are
   unmarked; they exist only for keyboard users (tab shows a port's name).
-- Services: each card shows only numeral + name; the subtext appears on hover/focus. On touch
-  screens (hover: none) the subtext is folded and a tap unfolds it.
-- "How We Work" heading is "Quietly, completely, and in person." (PK rejected "White glove is
-  not a promise. It is a procedure." — wrong rhythm, "procedure" sounds medical.) The third
-  principle is "With Discretion".
+- Services: each card shows only numeral + name, centred in the box. On hover/focus the name
+  floats up as the subtext unfolds beneath it (a `.more` block animating grid-template-rows
+  0fr→1fr inside a flex-centred cell), and settles back to the middle on leave. On touch screens
+  (hover: none) a tap toggles it. Cells have a fixed min-height so the grid never jumps.
+- "Exacting" appears once only, in the Services subhead; the Tax & Accounting line uses "rigorous".
+- Copy is PK's (Nov 2026): Mandate "Wealth of consequence reaches far beyond a portfolio.";
+  How We Work "Uncommon thoroughness in the conduct of your affairs."; third principle
+  "With Discretion" with the "foundational custom of the house" body; Engagement "Deliberately
+  limited in the families we serve." Do not rewrite these. (Rejected earlier: "White glove is not a
+  promise. It is a procedure." — wrong rhythm, "procedure" sounds medical.)
 - Contact is intentionally minimal: both "Request an Introduction" CTAs are silent email captures.
   They POST emailAddress to the private Google Form "Jajeh Family Office — Introductions"
   (published id 1FAIpQLSd0ztOChg3y5w_Arq-iIMRdTEIeVY3SpkFD3GVt9qiEcRy_QA, owner

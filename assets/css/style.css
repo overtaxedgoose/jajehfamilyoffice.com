@@ -180,17 +180,35 @@ main { position: relative; z-index: 1; }
 .hero h1 { max-width: 12em; }
 .hero p.lead { max-width: 34em; }
 
-/* Services grid — a numeral and a name; the rest is told on approach */
+/* Services grid — a numeral and a name, centred in the box. On approach the name floats up and
+   the rest unfolds beneath it; it settles back to the middle as the cursor leaves. */
 .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; border-top: 1px solid var(--hairline); border-left: 1px solid var(--hairline); margin-top: 2.5rem; }
-.service { border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 2.2rem 2rem; cursor: default; outline: none; }
-.service:focus-visible { box-shadow: inset 0 0 0 1px var(--brass); }
-.service .num { font-family: var(--display); font-size: .95rem; color: var(--brass-dim); letter-spacing: .1em; display: block; margin-bottom: 1rem; }
-.service p {
-  margin: 0; font-size: .98rem;
-  opacity: 0; transform: translateY(6px);
-  transition: opacity .7s ease, transform .7s ease;
+.service {
+  border-right: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline);
+  padding: 1.6rem 2rem;
+  min-height: 14rem;
+  display: flex; flex-direction: column; justify-content: center;
+  cursor: default; outline: none;
 }
-.service:hover p, .service:focus-within p, .service.open p { opacity: 1; transform: none; }
+.service:focus-visible { box-shadow: inset 0 0 0 1px var(--brass); }
+.service .num { font-family: var(--display); font-size: .95rem; line-height: 1.4; color: var(--brass-dim); letter-spacing: .1em; display: block; margin-bottom: .75rem; }
+.service h3 { margin: 0; line-height: 1.2; }
+.service .more {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows .7s cubic-bezier(.2, .7, .2, 1);
+}
+.service .more > p {
+  min-height: 0; overflow: hidden;
+  margin: 0; padding-top: 0;
+  font-size: .95rem; line-height: 1.6;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .5s ease, transform .5s ease, padding-top .7s cubic-bezier(.2, .7, .2, 1);
+}
+.service:hover .more, .service:focus-within .more, .service.open .more { grid-template-rows: 1fr; }
+.service:hover .more > p, .service:focus-within .more > p, .service.open .more > p {
+  opacity: 1; transform: none; padding-top: .7rem;
+  transition-delay: .15s, .15s, 0s;
+}
 
 /* Principles */
 .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 3.5rem; margin-top: 2.5rem; }
@@ -245,8 +263,8 @@ main { position: relative; z-index: 1; }
 @media (max-height: 820px) {
   .panel { padding-top: 4.8rem; }
   .rule { margin: 1.4rem 0; }
-  .service { padding: 1.5rem 1.4rem; }
-  .service p { line-height: 1.7; }
+  .service { padding: 1.4rem 1.6rem; min-height: 14rem; }
+  .service .more > p { font-size: .92rem; line-height: 1.55; }
   h2 { margin-bottom: .3em; }
   .services, .principles { margin-top: 1.8rem; }
   .principles { gap: 2.2rem; }
@@ -255,22 +273,19 @@ main { position: relative; z-index: 1; }
   .panel { padding: 4.6rem 0 2.5rem; }
   .engage { padding-bottom: 0; }
   .services { grid-template-columns: 1fr 1fr; }
-  .service { padding: 1.2rem 1rem; }
+  .service { padding: 1.2rem 1rem; min-height: 9rem; }
   .service h3 { font-size: 1.2rem; }
-  .service p { font-size: .9rem; line-height: 1.6; }
+  .service .more > p { font-size: .88rem; line-height: 1.55; }
   .principles { gap: 2rem; }
   .site-footer .wrap { justify-content: center; text-align: center; }
 }
-/* Without a cursor there is no hover: the subtext stays folded until tapped, so six fit one screen */
-@media (hover: none) {
-  .service p { max-height: 0; overflow: hidden; transition: opacity .7s ease, transform .7s ease, max-height .7s ease; }
-  .service.open p { max-height: 14em; }
-}
+/* Without a cursor there is no hover: a tap unfolds a service instead (class .open, set by script) */
 
 @media (prefers-reduced-motion: reduce) {
   .hero > .wrap { animation: none; }
   .sail { transition: none; animation: none; }
   .sail .hull { animation: none; }
   .sail img { transition: none; transform: none !important; }
-  .service p { transition: opacity .3s ease; transform: none; }
+  .service .more { transition: none; }
+  .service .more > p { transition: opacity .3s ease; transform: none; }
 }

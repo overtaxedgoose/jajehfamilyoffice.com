@@ -55,8 +55,8 @@
       <div class="wrap narrow">
         <p class="label">The Mandate</p>
         <hr class="rule">
-        <h2>Wealth of consequence is not a portfolio.</h2>
-        <p class="lead">It is companies and partnerships, trusts and properties, filings and deadlines, people and their futures &mdash; a hundred moving parts that do not manage themselves.</p>
+        <h2>Wealth of consequence reaches far beyond a portfolio.</h2>
+        <p class="lead">It encompasses companies and partnerships, trusts and properties, filings and deadlines, people and their futures &mdash; a hundred moving parts that require unified oversight.</p>
         <p>The Jajeh Family Office exists so that all of it is attended to as one. We sit on your side of the table, engage and coordinate every professional who serves you, and carry the details so they never carry you.</p>
       </div>
     </section>
@@ -70,32 +70,32 @@
           <div class="service" tabindex="0">
             <span class="num">I</span>
             <h3>Tax &amp; Accounting</h3>
-            <p>Planning, preparation, and exacting compliance across every entity and jurisdiction.</p>
+            <div class="more"><p>Planning, preparation, and rigorous compliance across every entity and jurisdiction.</p></div>
           </div>
           <div class="service" tabindex="0">
             <span class="num">II</span>
             <h3>Investment Oversight</h3>
-            <p>Independent supervision of managers, mandates, and performance &mdash; reported plainly.</p>
+            <div class="more"><p>Independent supervision of managers, mandates, and performance &mdash; reported plainly.</p></div>
           </div>
           <div class="service" tabindex="0">
             <span class="num">III</span>
             <h3>Legal Coordination</h3>
-            <p>Counsel engaged, briefed, and held to schedule across transactions, trusts, and disputes.</p>
+            <div class="more"><p>Counsel engaged, briefed, and held to schedule across transactions, trusts, and disputes.</p></div>
           </div>
           <div class="service" tabindex="0">
             <span class="num">IV</span>
             <h3>Business Interests</h3>
-            <p>Operating companies and partnerships stewarded from board level to bookkeeping.</p>
+            <div class="more"><p>Operating companies and partnerships stewarded from board level to bookkeeping.</p></div>
           </div>
           <div class="service" tabindex="0">
             <span class="num">V</span>
             <h3>Estate, Trusts &amp; Legacy</h3>
-            <p>Trusts established, funded, and administered; succession and philanthropy arranged for the generation after next.</p>
+            <div class="more"><p>Trusts established, funded, and administered; succession and philanthropy arranged for the generation after next.</p></div>
           </div>
           <div class="service" tabindex="0">
             <span class="num">VI</span>
             <h3>Household &amp; Administration</h3>
-            <p>Payroll, properties, insurance, bill pay &mdash; the quiet machinery of daily life, run without friction.</p>
+            <div class="more"><p>Payroll, properties, insurance, bill pay &mdash; the quiet machinery of daily life, run without friction.</p></div>
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@
       <div class="wrap">
         <p class="label">How We Work</p>
         <hr class="rule">
-        <h2>Quietly, completely, and in person.</h2>
+        <h2>Uncommon thoroughness in the conduct of your affairs.</h2>
         <div class="principles">
           <div class="principle">
             <span class="label">One Call</span>
@@ -117,7 +117,7 @@
           </div>
           <div class="principle">
             <span class="label">With Discretion</span>
-            <p>Confidentiality is not a policy here; it is the practice of the house. Your affairs remain yours.</p>
+            <p>Confidentiality is the foundational custom of the house. Your name, your holdings, and your affairs remain strictly yours.</p>
           </div>
         </div>
       </div>
@@ -127,8 +127,8 @@
       <div class="wrap">
         <p class="label">Engagement</p>
         <hr class="rule center">
-        <h2>We choose to serve few families.</h2>
-        <p>Every engagement begins with a private conversation. If we are the right office for your family &mdash; and your family for ours &mdash; you will know quickly.</p>
+        <h2>Deliberately limited in the families we serve.</h2>
+        <p>Our standard of care requires time, proximity, and senior attention. Every relationship begins with a private conversation among principals to determine whether our office is the right fit for your family&rsquo;s affairs.</p>
         <form class="intro-form center" data-intro autocomplete="email">
           <input type="email" name="email" placeholder="Your email" required aria-label="Your email">
           <button class="btn" type="submit">Request an Introduction</button>
@@ -161,6 +161,9 @@
       ports.forEach((li, i) => { li.style.left = (i / last * 100) + '%'; });
       if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
+      const asked = panels.findIndex(p => '#' + p.id === location.hash);   // a link straight to a panel
+      let at = asked >= 0 ? asked : nearest(window.scrollY), busy = false, restUntil = 0;
+
       // Where we are. Runs every scroll frame: sets the sail, the panel in view, and each panel's words.
       let lastY = window.scrollY, settle = 0, queued = false;
       function paint() {
@@ -185,10 +188,16 @@
         lastY = y;
       }
       const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(paint); } };
-      addEventListener('scroll', schedule, { passive: true });
+      // A scroll we did not make (find-in-page, a focus, a hash) is allowed, then the page glides back to a panel.
+      let stray = 0;
+      addEventListener('scroll', () => {
+        schedule();
+        if (busy) return;
+        clearTimeout(stray);
+        stray = setTimeout(() => { if (!busy && Math.abs(window.scrollY - panels[at].offsetTop) > 1) sailTo(nearest(window.scrollY)); }, 180);
+      }, { passive: true });
 
       // Sailing. A long, even glide from one panel to the next; longer still across several.
-      let at = nearest(window.scrollY), busy = false, restUntil = 0;
       const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
       function sailTo(k) {
         k = Math.max(0, Math.min(last, k));
@@ -196,7 +205,7 @@
         at = k;
         if (still || Math.abs(to - from) < 1) { window.scrollTo(0, to); paint(); return; }
         const screens = Math.abs(to - from) / window.innerHeight;
-        const length = Math.min(1600 + 400 * (screens - 1), 2800);
+        const length = screens < 1 ? 600 + 1000 * screens : Math.min(1600 + 400 * (screens - 1), 2800);
         busy = true;
         const t0 = performance.now();
         (function step(now) {
