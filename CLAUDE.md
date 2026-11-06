@@ -35,12 +35,19 @@ Hosted on GitHub Pages (repo: overtaxedgoose/jajehfamilyoffice.com). Built Augus
   "With Discretion" with the "foundational custom of the house" body; Engagement "Deliberately
   limited in the families we serve." Do not rewrite these. (Rejected earlier: "White glove is not a
   promise. It is a procedure." — wrong rhythm, "procedure" sounds medical.)
-- Contact is intentionally minimal: both "Request an Introduction" CTAs are silent email captures.
-  They POST emailAddress to the private Google Form "Jajeh Family Office — Introductions"
-  (published id 1FAIpQLSd0ztOChg3y5w_Arq-iIMRdTEIeVY3SpkFD3GVt9qiEcRy_QA, owner
+- Contact is intentionally minimal. Both "Request an Introduction" buttons open the Inquiry
+  screen (`#inquiry`, a fixed layer over the page; sailing stands down while it is open; Close or
+  Esc returns). It presents two doors, PK's copy: "Full Family Office Mandate" (typically $25M+)
+  and "Private Wealth & Tax Advisory". The first unfolds the silent email capture; the second
+  unfolds "For dedicated advisory mandates, we invite you to explore Jajeh Financial, our private
+  client practice." with a button to https://jajehfinancial.com.
+- The email capture POSTs emailAddress to the private Google Form "Jajeh Family Office —
+  Introductions" (published id 1FAIpQLSd0ztOChg3y5w_Arq-iIMRdTEIeVY3SpkFD3GVt9qiEcRy_QA, owner
   patrick@jajehgroup.com, notifications on). On submit the form dissolves into a thank-you and
   localStorage key `jfo-introduction-requested` limits each browser to one request — this
   one-shot "we'll contact you" behavior is deliberate; do not add a normal contact form.
+- Footer reads "Private Multi-Family Office · A Jajeh Group Company", then the offices line
+  "San Francisco · Atlanta · Singapore" in small caps, then the copyright.
 - The gold mark (assets/img/mark-gold.png) is generated from the brand kit's BoatOnly logo,
   recolored to brass #ad9161 — regenerate from the kit rather than editing pixels.
 

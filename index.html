@@ -43,11 +43,7 @@
         <hr class="rule">
         <h1>One office for the whole of your&nbsp;wealth.</h1>
         <p class="lead">A private family office serving a small number of families &mdash; accounting, investments, legal affairs, business interests, and everything they touch. One team. One standard. One&nbsp;call.</p>
-        <form class="intro-form" data-intro autocomplete="email">
-          <input type="email" name="email" placeholder="Your email" required aria-label="Your email">
-          <button class="btn" type="submit">Request an Introduction</button>
-        </form>
-        <p class="intro-thanks" data-thanks hidden>Thank you. We will be in touch.</p>
+        <button class="btn cta" type="button" data-open-inquiry>Request an Introduction</button>
       </div>
     </section>
 
@@ -129,21 +125,55 @@
         <hr class="rule center">
         <h2>Deliberately limited in the families we serve.</h2>
         <p>Our standard of care requires time, proximity, and senior attention. Every relationship begins with a private conversation among principals to determine whether our office is the right fit for your family&rsquo;s affairs.</p>
-        <form class="intro-form center" data-intro autocomplete="email">
-          <input type="email" name="email" placeholder="Your email" required aria-label="Your email">
-          <button class="btn" type="submit">Request an Introduction</button>
-        </form>
-        <p class="intro-thanks" data-thanks hidden>Thank you. We will be in touch.</p>
+        <button class="btn cta" type="button" data-open-inquiry>Request an Introduction</button>
       </div>
       <footer class="site-footer">
         <div class="wrap">
           <a class="brand" href="#top"><img src="/assets/img/mark-gold.png" alt="Jajeh Family Office"></a>
-          <span>A <a href="https://jajehgroup.com">Jajeh Group</a> company</span>
-          <span>Copyright &copy; 2026 Jajeh Family Office &mdash; All Rights Reserved.</span>
+          <span class="who">Private Multi-Family Office &middot; A <a href="https://jajehgroup.com">Jajeh Group</a> Company</span>
+          <span class="where">San Francisco &middot; Atlanta &middot; Singapore</span>
+          <span class="legal">Copyright &copy; 2026 Jajeh Family Office &mdash; All Rights Reserved.</span>
         </div>
       </footer>
     </section>
   </main>
+
+  <!-- Request an Introduction: a quiet screen of its own, over the page. Two doors; one leads to
+       the private form, the other to Jajeh Financial. -->
+  <section class="inquiry" id="inquiry" hidden aria-labelledby="inquiry-title">
+    <div class="wrap">
+      <button class="close" type="button" data-close>Close</button>
+      <p class="label">Request an Introduction</p>
+      <hr class="rule">
+      <h2 id="inquiry-title">Select the nature of your inquiry.</h2>
+      <p>To ensure your note reaches the appropriate principal across the Jajeh Group, please indicate the scope of your affairs:</p>
+      <div class="doors" role="radiogroup" aria-label="Nature of inquiry">
+        <button class="door" type="button" role="radio" aria-checked="false" data-door="office">
+          <h3>Full Family Office Mandate</h3>
+          <p>For families and principals managing multi-entity structures, operating businesses, complex estates, and substantial balance sheets (typically $25M+ in complexity).</p>
+        </button>
+        <button class="door" type="button" role="radio" aria-checked="false" data-door="advisory">
+          <h3>Private Wealth &amp; Tax Advisory</h3>
+          <p>For individuals, executives, and business owners seeking dedicated tax, accounting, or investment management without full family office administration.</p>
+        </button>
+      </div>
+      <div class="answer" data-answer="office">
+        <div>
+          <form class="intro-form" data-intro autocomplete="email">
+            <input type="email" name="email" placeholder="Your email" required aria-label="Your email">
+            <button class="btn" type="submit">Request an Introduction</button>
+          </form>
+          <p class="intro-thanks" data-thanks hidden>Thank you. We will be in touch.</p>
+        </div>
+      </div>
+      <div class="answer" data-answer="advisory">
+        <div>
+          <p>For dedicated advisory mandates, we invite you to explore Jajeh Financial, our private client practice.</p>
+          <a class="btn" href="https://jajehfinancial.com">Jajeh Financial</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <script>
     // The page moves only by our hand. One panel at a time, slowly, eased at both ends; the
@@ -157,6 +187,7 @@
       const last = panels.length - 1;
       const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
       const tops = () => panels.map(p => p.offsetTop);
+      const inquiring = () => document.body.classList.contains('inquiring');   // the inquiry screen is open
       const nearest = y => { const t = tops(); let k = 0; t.forEach((top, i) => { if (Math.abs(top - y) < Math.abs(t[k] - y)) k = i; }); return k; };
       ports.forEach((li, i) => { li.style.left = (i / last * 100) + '%'; });
       if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -227,6 +258,7 @@
       // Wheel and trackpad: one gesture, one panel. The inertia tail of a gesture is ignored.
       let lastWheel = 0, gestureSpent = false;
       addEventListener('wheel', e => {
+        if (inquiring()) return;
         const now = performance.now();
         if (now - lastWheel > 160) gestureSpent = false;
         lastWheel = now;
@@ -239,6 +271,7 @@
       // Touch: a swipe of any weight moves one panel, unless the panel itself has room to scroll.
       let touch = null;
       addEventListener('touchstart', e => {
+        if (inquiring()) { touch = null; return; }
         touch = { y: e.touches[0].clientY, down: innerRoom(e.target, 1), up: innerRoom(e.target, -1) };
       }, { passive: true });
       addEventListener('touchend', e => {
@@ -251,9 +284,10 @@
 
       // Keys: arrows, page keys and space move one panel; Home and End go to the ends.
       addEventListener('keydown', e => {
-        if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+        if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || inquiring()) return;
         const el = e.target, tag = (el.tagName || '').toLowerCase();
-        if (/^(input|textarea|select|button)$/.test(tag) || el.isContentEditable) return;
+        if (/^(input|textarea|select)$/.test(tag) || el.isContentEditable) return;
+        if (tag === 'button' && (e.key === ' ' || e.key === 'Enter')) return;   // a focused button keeps its own keys
         const step = { ArrowDown: 1, PageDown: 1, ' ': e.shiftKey ? -1 : 1, ArrowUp: -1, PageUp: -1 }[e.key];
         if (step) { e.preventDefault(); go(step); }
         else if (e.key === 'Home') { e.preventDefault(); sailTo(0); }
@@ -283,6 +317,33 @@
       if (matchMedia('(hover: none)').matches) {
         document.querySelectorAll('.service').forEach(s => s.addEventListener('click', () => s.classList.toggle('open')));
       }
+    })();
+
+    // Request an Introduction: open the inquiry screen, choose a door, and the answer unfolds beneath.
+    (() => {
+      const inquiry = document.getElementById('inquiry');
+      const doors = inquiry.querySelectorAll('.door');
+      const answers = inquiry.querySelectorAll('.answer');
+      let opener = null, closing = 0;
+      function open(from) {
+        opener = from;
+        clearTimeout(closing);
+        inquiry.hidden = false;
+        document.body.classList.add('inquiring');
+        requestAnimationFrame(() => requestAnimationFrame(() => { inquiry.classList.add('in'); doors[0].focus({ preventScroll: true }); }));
+      }
+      function close() {
+        inquiry.classList.remove('in');
+        document.body.classList.remove('inquiring');
+        closing = setTimeout(() => { inquiry.hidden = true; if (opener) opener.focus({ preventScroll: true }); }, 800);
+      }
+      document.querySelectorAll('[data-open-inquiry]').forEach(b => b.addEventListener('click', () => open(b)));
+      inquiry.querySelector('[data-close]').addEventListener('click', close);
+      addEventListener('keydown', e => { if (e.key === 'Escape' && !inquiry.hidden) close(); });
+      doors.forEach(d => d.addEventListener('click', () => {
+        doors.forEach(o => o.setAttribute('aria-checked', String(o === d)));
+        answers.forEach(a => a.classList.toggle('open', a.dataset.answer === d.dataset.door));
+      }));
     })();
 
     // Introduction requests: one per browser. Submissions post silently to a private form;
